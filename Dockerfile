@@ -38,8 +38,9 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && chmod a+rwX /etc/nginx/http.d/default.conf /var/lib/nginx /var/lib/nginx/tmp /var/run
 
 ENV USER_AGENT="RadioBuffer" \
-    STREAM_URL="http://localhost:1234" \
-    REQUIRED_COLLECTED_MB=""
+    STREAM_URL="" \
+    REQUIRED_COLLECTED_MB="" \
+    DATA_DIR="/data"
 
 COPY ./entrypoint.sh /usr/local/bin/entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint"]

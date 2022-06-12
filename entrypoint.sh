@@ -10,6 +10,11 @@ elog() {
   echo "[${COMPONENT}]" "${@}"
 }
 
+eerror() {
+  echo "$@"
+  exit 1
+}
+
 _configure_proxy() {
   elog "Proxy" "configuring proxy"
   cat << EOF > /etc/nginx/http.d/default.conf
@@ -85,6 +90,11 @@ _waiter() {
 }
 
 _initialize() {
+
+  test -z "${STREAM_URL}" && eerror "No STREAM_URL provided"
+  test -z "${DATA_DIR}" && eerror "No DATA_DIR provided"
+  test -z "${USER_AGENT}" && eerror "No USER_AGENT provided"
+
   case "${STREAM_URL}" in
     "https://"*)
       _configure_proxy
