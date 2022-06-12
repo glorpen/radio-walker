@@ -13,6 +13,8 @@ _build() {
     wget https://nav.dl.sourceforge.net/project/streamripper/streamripper%20%28current%29/${SR_VERSION}/streamripper-${SR_VERSION}.tar.gz -O streamripper.tar.gz
   fi
 
+  chmod a+r nginx.conf
+
   docker build -t glorpen/radiobuffer:${TAG/v/} "${PROJECT_DIR}"
 }
 

@@ -35,7 +35,7 @@ EOF
 
 _start_streamripper() {
   elog "Streamripper" "running"
-  rm -rf /data/incomplete
+  rm -rf "${DATA_DIR}/incomplete"
   URL="${1}"
   shift
   exec streamripper "${URL}" -s -u "${USER_AGENT}" -d "${DATA_DIR}" "$@"
@@ -50,42 +50,52 @@ _start_ripping() {
   esac
 }
 
+_waiter_collect() {
+  elog "Waiter" "waiting for ${REQUIRED_COLLECTED_MB}MB of collected music..."
+  while :;
+  do
+    if inotifywait -qq -e moved_to "${DATA_DIR}";
+    then
+      collected_mb=$(du -ms "${DATA_DIR}" | awk '{ print $1 }')
+      if [ $collected_mb -ge $REQUIRED_COLLECTED_MB ];
+      then
+        elog "Waiter" "collected ${collected_mb}MB of music, stopping ripping process."
+        break
+      else
+        elog "Waiter" "collected ${collected_mb}MB of ${REQUIRED_COLLECTED_MB}MB music, continuing."
+      fi
+    fi
+  done
+}
+
+_waiter_pause() {
+  while :;
+  do
+    if inotifywait -qq -e moved_from -e delete "${DATA_DIR}";
+    then
+      if [ $(du -ms "${DATA_DIR}" | awk '{ print $1 }') -lt $REQUIRED_COLLECTED_MB ];
+      then
+        elog "Waiter" "collection size decreased, starting ripping process."
+        break
+      fi
+    fi
+  done
+}
+
 _waiter() {
-  trap '{ kill $worker_pid; wait; exit 0; }' INT TERM
+  trap '{ kill $worker_pid &>/dev/null; wait $worker_pid; exit 0; }' INT TERM QUIT
 
   while :;
   do
     _start_ripping "$@" &
     worker_pid=$!
 
-    elog "Waiter" "waiting for ${REQUIRED_COLLECTED_MB}MB of collected music..."
-    while :;
-    do
-      if inotifywait -qq -e moved_to "${DATA_DIR}";
-      then
-        collected_mb=$(du -ms "${DATA_DIR}" | awk '{ print $1 }')
-        if [ $collected_mb -ge $REQUIRED_COLLECTED_MB ];
-        then
-          elog "Waiter" "collected ${collected_mb}MB of music, stopping ripping process."
-          kill $worker_pid
-          break
-        else
-          elog "Waiter" "collected ${collected_mb}MB of ${REQUIRED_COLLECTED_MB}MB music, continuing."
-        fi
-      fi
-    done
+    _waiter_collect &
+    wait $!
+    kill $worker_pid
 
-    while :;
-    do
-      if inotifywait -qq -e moved_from -e delete "${DATA_DIR}";
-      then
-        if [ $(du -ms "${DATA_DIR}" | awk '{ print $1 }') -lt $REQUIRED_COLLECTED_MB ];
-        then
-          elog "Waiter" "collection size decreased, starting ripping process."
-          break
-        fi
-      fi
-    done
+    _waiter_pause &
+    wait $!
   done
 }
 

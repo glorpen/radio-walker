@@ -43,4 +43,5 @@ ENV USER_AGENT="RadioBuffer" \
     DATA_DIR="/data"
 
 COPY ./entrypoint.sh /usr/local/bin/entrypoint
+STOPSIGNAL SIGTERM
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
