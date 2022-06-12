@@ -14,6 +14,7 @@ RUN mkdir /root/build \
 
 WORKDIR /root/build
 
+# https://sourceforge.net/p/streamripper/bugs/193/
 COPY ./streamripper-http-1.0.patch streamripper-http-1.0.patch
 RUN cat streamripper-http-1.0.patch | patch -p1 \
     && sed -i lib/ripstream.c -e 's/__uint32_t/uint32_t/g'
