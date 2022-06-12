@@ -1,0 +1,44 @@
+FROM alpine:3.16 as base
+
+RUN apk add --no-cache glib libmad libvorbis nginx gnu-libiconv inotify-tools
+
+FROM base as build
+
+RUN apk add --no-cache glib-dev libc-dev libmad-dev libvorbis-dev gcc libtool automake autoconf patch m4 make gnu-libiconv-dev
+
+RUN wget https://nav.dl.sourceforge.net/project/streamripper/streamripper%20%28current%29/1.64.6/streamripper-1.64.6.tar.gz -O /root/streamripper.tar.gz \
+    && mkdir /root/build \
+    && tar xpf /root/streamripper.tar.gz -C /root/build --strip-components 1 \
+    && rm /root/streamripper.tar.gz
+
+WORKDIR /root/build
+
+COPY ./streamripper-http-1.0.patch streamripper-http-1.0.patch
+RUN cat streamripper-http-1.0.patch | patch -p1 \
+    && sed -i lib/ripstream.c -e 's/__uint32_t/uint32_t/g'
+
+RUN libtoolize --install --copy --force --automake \
+    && aclocal -I m4 \
+    && autoconf --force \
+    && autoheader \
+    && automake --add-missing --copy --foreign --force-missing
+
+RUN ./configure --prefix=/usr/local --disable-dependency-tracking --disable-silent-rules --without-included-libmad --without-included-argv --with-ogg \
+    && make DESTDIR=/root/image install
+
+FROM base
+
+COPY --from=build /root/image/usr/local/ /usr/local/
+
+COPY ./nginx.conf /etc/nginx/nginx.conf
+
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stdout /var/log/nginx/error.log \
+    && chmod a+rwX /etc/nginx/http.d/default.conf /var/lib/nginx /var/lib/nginx/tmp /var/run
+
+ENV USER_AGENT="Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0" \
+    STREAM_URL="http://localhost:1234" \
+    REQUIRED_COLLECTED_MB=""
+
+COPY ./entrypoint.sh /usr/local/bin/entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint"]
