@@ -37,7 +37,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stdout /var/log/nginx/error.log \
     && chmod a+rwX /etc/nginx/http.d/default.conf /var/lib/nginx /var/lib/nginx/tmp /var/run
 
-ENV USER_AGENT="RadioBuffer" \
+ENV USER_AGENT="RadioWalker" \
     STREAM_URL="" \
     REQUIRED_COLLECTED_MB="" \
     DATA_DIR="/data"

@@ -15,7 +15,7 @@ _build() {
 
   chmod a+r nginx.conf
 
-  docker build -t "glorpen/radiobuffer:${TAG/v/}" "${PROJECT_DIR}"
+  docker build -t "glorpen/radio-walker:${TAG/v/}" "${PROJECT_DIR}"
 }
 
 _clean() {

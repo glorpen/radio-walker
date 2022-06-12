@@ -1,6 +1,6 @@
-# Radio Buffer
+# Radio Walker
 
-Helps to prepare music for a walk or other offline activities.
+Prepare fresh offline music for a walk or other offline activities.
 
 ## Configuration
 
@@ -11,7 +11,7 @@ Envs:
 - `REQUIRED_COLLECTED_MB` size after which collecting music will be paused
 - `DATA_DIR` path where music will be stored, defaults to `/data`
 
-All command options are passed to `streamripper` binary, run `glorpen/radiobuffer -h` for more info.
+All command options are passed to `streamripper` binary, run `glorpen/radio-walker -h` for more info.
 
 ## How it works
 
