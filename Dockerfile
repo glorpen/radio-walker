@@ -6,8 +6,9 @@ FROM base as build
 
 RUN apk add --no-cache glib-dev libc-dev libmad-dev libvorbis-dev gcc libtool automake autoconf patch m4 make gnu-libiconv-dev
 
-RUN wget https://nav.dl.sourceforge.net/project/streamripper/streamripper%20%28current%29/1.64.6/streamripper-1.64.6.tar.gz -O /root/streamripper.tar.gz \
-    && mkdir /root/build \
+COPY ./streamripper.tar.gz /root/
+
+RUN mkdir /root/build \
     && tar xpf /root/streamripper.tar.gz -C /root/build --strip-components 1 \
     && rm /root/streamripper.tar.gz
 
@@ -36,7 +37,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stdout /var/log/nginx/error.log \
     && chmod a+rwX /etc/nginx/http.d/default.conf /var/lib/nginx /var/lib/nginx/tmp /var/run
 
-ENV USER_AGENT="Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0" \
+ENV USER_AGENT="RadioBuffer" \
     STREAM_URL="http://localhost:1234" \
     REQUIRED_COLLECTED_MB=""
 
