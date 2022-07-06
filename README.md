@@ -1,14 +1,14 @@
 # Radio Walker
 
-Prepare fresh offline music for a walk or other offline activities.
-
 | [Codeberg](https://codeberg.org/glorpen/radio-walker)
-| [GitLab](https://gitlab.com/glorpen/radio-walker)
-| [GitHub](https://github.com/glorpen/radio-walker)
-| [Bitbucket](https://bitbucket.org/glorpen/radio-walker/src/master/)
 | [Docker Hub](https://hub.docker.com/r/glorpen/radio-walker)
+| Mirrors:
+    [GitLab](https://gitlab.com/glorpen/radio-walker),
+    [GitHub](https://github.com/glorpen/radio-walker),
+    [Bitbucket](https://bitbucket.org/glorpen/radio-walker)
 |
 
+Prepare fresh offline music for a walk or other offline activities.
 
 ## Configuration
 
